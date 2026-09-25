@@ -1,0 +1,10 @@
+__pycache__/
+*.py[cod]
+.venv/
+.env
+config/.env
+*.db
+database/*.db
+uploads/
+node_modules/
+.DS_Store
