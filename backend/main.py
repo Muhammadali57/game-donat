@@ -258,6 +258,56 @@ async def support(data:TicketIn):
         db.add(SupportTicket(user_id=u.id,message=data.message)); await db.commit()
         return {"ok":True}
 
+
+
+def is_admin(admin_id:str)->bool:
+    return admin_id in [x.strip() for x in settings.admin_ids.split(",") if x.strip()]
+
+@app.get("/api/admin/stats")
+async def admin_stats(x_admin_id:str=Header("")):
+    if not is_admin(x_admin_id): raise HTTPException(403,"Forbidden")
+    async with Session() as db:
+        users=(await db.execute(select(User))).scalars().all()
+        orders=(await db.execute(select(Order))).scalars().all()
+        deposits=(await db.execute(select(Deposit))).scalars().all()
+        return {
+            "users":len(users),
+            "active_users":sum(1 for u in users if u.balance>0),
+            "orders":len(orders),
+            "pending_orders":sum(1 for o in orders if o.status in ("pending","processing")),
+            "deposits":len(deposits),
+            "pending_deposits":sum(1 for d in deposits if d.status=="pending"),
+            "income":sum(d.credited_amount for d in deposits if d.status=="approved"),
+            "order_value":sum(o.price for o in orders if o.status!="cancelled")
+        }
+
+@app.get("/api/admin/orders")
+async def admin_orders(x_admin_id:str=Header("")):
+    if not is_admin(x_admin_id): raise HTTPException(403,"Forbidden")
+    async with Session() as db:
+        rows=(await db.execute(select(Order).order_by(Order.id.desc()).limit(200))).scalars().all()
+        return [{"id":o.id,"user_id":o.user_id,"product_id":o.product_id,"status":o.status,"price":o.price,"discount":o.discount_applied,"created_at":o.created_at.isoformat()} for o in rows]
+
+@app.post("/api/admin/orders/{order_id}/status")
+async def admin_order_status(order_id:int,status:str,x_admin_id:str=Header("")):
+    if not is_admin(x_admin_id): raise HTTPException(403,"Forbidden")
+    allowed={"pending","processing","awaiting_otp","completed","cancelled","refunded"}
+    if status not in allowed: raise HTTPException(400,"Invalid status")
+    async with Session() as db:
+        o=await db.get(Order,order_id)
+        if not o: raise HTTPException(404,"Order not found")
+        o.status=status
+        if status=="completed": o.completed_at=datetime.now(timezone.utc)
+        await db.commit()
+        return {"ok":True,"status":o.status}
+
+@app.get("/api/admin/deposits")
+async def admin_deposits(x_admin_id:str=Header("")):
+    if not is_admin(x_admin_id): raise HTTPException(403,"Forbidden")
+    async with Session() as db:
+        rows=(await db.execute(select(Deposit).order_by(Deposit.id.desc()).limit(200))).scalars().all()
+        return [{"id":d.id,"user_id":d.user_id,"requested_amount":d.requested_amount,"credited_amount":d.credited_amount,"status":d.status,"receipt_path":d.receipt_path,"created_at":d.created_at.isoformat()} for d in rows]
+
 @app.get("/api/payment-config")
 async def payment_config():
     return {"manual_receipt":True,"google_pay":False,"click":False,"octo":False,"card_gateway":False,"card_number":settings.card_number,"card_owner":settings.card_owner}
