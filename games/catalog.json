@@ -1,0 +1,9 @@
+[
+{"slug":"wuthering-waves","name":"Wuthering Waves","asset_dir":"assets/games/wuthering-waves","account_mode":"player_id"},
+{"slug":"pgr","name":"Punishing: Gray Raven","asset_dir":"assets/games/pgr","account_mode":"login"},
+{"slug":"genshin","name":"Genshin Impact","asset_dir":"assets/games/genshin","account_mode":"player_id"},
+{"slug":"hsr","name":"Honkai: Star Rail","asset_dir":"assets/games/hsr","account_mode":"player_id"},
+{"slug":"zzz","name":"Zenless Zone Zero","asset_dir":"assets/games/zzz","account_mode":"login"},
+{"slug":"endfield","name":"Arknights: Endfield","asset_dir":"assets/games/endfield","account_mode":"login"},
+{"slug":"nte","name":"Neverness to Everness","asset_dir":"assets/games/nte","account_mode":"otp_email"}
+]
