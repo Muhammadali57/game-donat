@@ -6,3 +6,4 @@ asyncpg>=0.29,<1
 pydantic-settings>=2,<3
 python-multipart>=0.0.9,<1
 python-telegram-bot>=22,<23
+python-dotenv>=1.0,<2
