@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Game Top-Up</title><link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div id="app">
+<header><button id="back" class="icon hidden">←</button><div><h1 id="title">Game Top-Up</h1><small id="subtitle">O‘yinlar</small></div><button id="balance" class="balance">0 so‘m ＋</button></header>
+<main id="content"></main>
+<nav><button data-page="home">🏠 Bosh sahifa</button><button data-page="orders">📜 Xaridlar</button><button data-page="profile">👤 Profil</button></nav>
+</div>
+<div id="modal" class="modal hidden"></div>
+<script>window.API_BASE_URL=localStorage.getItem('API_BASE_URL')||'http://127.0.0.1:8000/api';</script>
+<script src="app.js"></script>
+</body></html>
